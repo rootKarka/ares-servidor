@@ -1,0 +1,27 @@
+# PostgreSQL para desarrollo local.
+#   Levantar:  docker compose up -d      (o: npm run db:up)
+#   Apagar:    docker compose down       (los datos se conservan en el volumen)
+#   Borrar TODO, incluidos los datos:  docker compose down -v
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: ares-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ares
+      POSTGRES_PASSWORD: ares_dev_password
+      POSTGRES_DB: ares
+    ports:
+      # Si ya tienes un Postgres en tu PC usando el 5432, cambia a "5433:5432"
+      # y ajusta el puerto en DATABASE_URL del .env.
+      - "5432:5432"
+    volumes:
+      - ares_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ares -d ares"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  ares_pgdata:
